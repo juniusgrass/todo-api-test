@@ -1,4 +1,4 @@
-name: API Test CI
+name: Todo API Tests
 
 on:
   push:
@@ -16,20 +16,20 @@ jobs:
       # 1. 拉取代码
       - uses: actions/checkout@v3
 
-      # 2. 列出当前工作目录文件，确认 Postman collection 存在
+      # 2. 确认文件存在，打印目录
       - name: List files in workspace
         run: ls -l
 
-      # 3. 安装 Node.js（newman 依赖 Node.js）
+      # 3. 安装 Node.js，Newman 依赖它
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
 
-      # 4. 全局安装 newman
+      # 4. 全局安装 Newman
       - name: Install Newman
         run: npm install -g newman
 
-      # 5. 运行 newman，执行接口测试并输出 junit 格式结果
+      # 5. 运行 Newman 测试
       - name: Run Newman tests
         run: newman run todo-api.postman_collection.json --reporters cli,junit --reporter-junit-export results.xml
