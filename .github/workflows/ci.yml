@@ -13,23 +13,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      # 1. 拉取代码
+      - uses: actions/checkout@v3
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '16'  # 你可以用你需要的版本
+      # 2. 列出当前工作目录文件，确认 Postman collection 存在
+      - name: List files in workspace
+        run: ls -l
 
-    - name: Install Newman
-      run: npm install -g newman
+      # 3. 安装 Node.js（newman 依赖 Node.js）
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
 
-    - name: Run API tests with Newman
-      run: |
-        newman run "Todo API Collection.postman_collection.json" --reporters cli,junit --reporter-junit-export results.xml
+      # 4. 全局安装 newman
+      - name: Install Newman
+        run: npm install -g newman
 
-    - name: Upload test results
-      uses: actions/upload-artifact@v4
-      with:
-        name: newman-results
-        path: results.xml
+      # 5. 运行 newman，执行接口测试并输出 junit 格式结果
+      - name: Run Newman tests
+        run: newman run todo-api.postman_collection.json --reporters cli,junit --reporter-junit-export results.xml
