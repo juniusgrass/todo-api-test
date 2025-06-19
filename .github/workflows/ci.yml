@@ -2,34 +2,35 @@ name: Todo API Tests
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   pull_request:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
   test:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. 拉取代码
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      # 2. 确认文件存在，打印目录
       - name: List files in workspace
         run: ls -l
 
-      # 3. 安装 Node.js，Newman 依赖它
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
 
-      # 4. 全局安装 Newman
-      - name: Install Newman
-        run: npm install -g newman
+      - name: Install Newman and HTML reporter
+        run: npm install -g newman newman-reporter-htmlextra
 
-      # 5. 运行 Newman 测试，带 --suppress-exit-code 忽略断言失败导致的错误退出
-      - name: Run Newman tests
-        run: newman run todo-api.postman_collection.json --reporters cli,junit --reporter-junit-export results.xml --suppress-exit-code
+      - name: Run Newman tests with HTML report
+        run: |
+          newman run todo-api.postman_collection.json -r cli,htmlextra --reporter-htmlextra-export report.html --suppress-exit-code
+
+      - name: Upload Newman HTML report as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: newman-html-report
+          path: report.html
